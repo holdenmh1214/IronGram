@@ -20,6 +20,17 @@ public class Photo {
     @Column(nullable = false)
     public LocalDateTime timestamp;
 
+    @Column(nullable = false)
+    public int interval;
+
+    @Column(nullable = false)
+    public boolean isPublic;
+
+
+
+
+
+
     @ManyToOne
     public User sender;
 

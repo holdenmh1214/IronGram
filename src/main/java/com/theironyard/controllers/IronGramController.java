@@ -18,6 +18,7 @@ import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
 import java.security.spec.InvalidKeySpecException;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -71,7 +72,9 @@ public class IronGramController {
     public Photo upload(HttpSession session,
                         HttpServletResponse response,
                         String receiver,
-                        MultipartFile photo
+                        MultipartFile photo,
+                        int interval,
+                        boolean isPublic
                         ) throws Exception {
         String username =(String) session.getAttribute("username");
         if (username == null){
@@ -92,6 +95,8 @@ public class IronGramController {
         Photo p = new Photo();
         p.date = LocalDateTime.now().toString();
         p.timestamp = LocalDateTime.now();
+        p.interval = interval;
+        p.isPublic = isPublic;
         p.sender = senderUser;
         p.receiver = receiverUser;
         p.filename = photoFile.getName();
@@ -113,11 +118,25 @@ public class IronGramController {
         List<Photo> photosL = photos.findByReceiver(user);
 
         for (Photo p: photosL) {
-            if (LocalDateTime.now().minusSeconds(10).isAfter(p.timestamp)) {
+            if (LocalDateTime.now().minusSeconds(p.interval).isAfter(p.timestamp)) {
                 photos.delete(p);
             }
         }
 
         return photos.findByReceiver(user);
     }
+
+    @RequestMapping("/public-photos")
+    public List<Photo> publicPhotos(String username){
+        User user = users.findOneByUsername(username);
+
+        ArrayList<Photo> pubList = new ArrayList<>();
+        for (Photo photo: photos.findBySender(user)){
+            if (photo.isPublic=true){
+                pubList.add(photo);
+            }
+        }
+        return pubList;
+    }
+
 }
