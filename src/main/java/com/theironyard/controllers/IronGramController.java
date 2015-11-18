@@ -17,6 +17,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
 import java.security.spec.InvalidKeySpecException;
+import java.time.LocalDateTime;
 import java.util.List;
 
 /**
@@ -89,6 +90,8 @@ public class IronGramController {
         fos.write(photo.getBytes());
 
         Photo p = new Photo();
+        p.date = LocalDateTime.now().toString();
+        p.timestamp = LocalDateTime.now();
         p.sender = senderUser;
         p.receiver = receiverUser;
         p.filename = photoFile.getName();
@@ -106,6 +109,14 @@ public class IronGramController {
         }
 
         User user = users.findOneByUsername(username);
+
+        List<Photo> photosL = photos.findByReceiver(user);
+
+        for (Photo p: photosL) {
+            if (LocalDateTime.now().minusSeconds(10).isAfter(p.timestamp)) {
+                photos.delete(p);
+            }
+        }
 
         return photos.findByReceiver(user);
     }

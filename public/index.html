@@ -27,12 +27,13 @@
 <script src="jquery-2.1.4.min.js"></script>
 <script>
     function getPhotos(photosData){
-       $("#photos").empty();
+        $("#photos").empty();
        for (var i  in photosData){
             var photo = photosData[i];
             var elem = $("<img>");
             elem.attr("src", photo.filename);
             $("#photos").append(elem);
+            $("#photos").append(photo.date);
         }
 
     }
